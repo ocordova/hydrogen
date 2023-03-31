@@ -4,6 +4,7 @@
 
 import type {Storefront} from '~/lib/type';
 import type {HydrogenSession} from '~/lib/session.server';
+import type {CustomerClient} from '@shopify/hydrogen';
 
 declare global {
   /**
@@ -32,6 +33,7 @@ declare module '@shopify/remix-oxygen' {
     waitUntil: ExecutionContext['waitUntil'];
     session: HydrogenSession;
     storefront: Storefront;
+    customer: CustomerClient;
     cache: Cache;
     env: Env;
   }

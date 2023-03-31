@@ -1,28 +1,19 @@
 import {
-  type MetaFunction,
   type ActionFunction,
   type LoaderArgs,
   redirect,
   json,
 } from '@shopify/remix-oxygen';
-import {Form, Link, useActionData, useLoaderData} from '@remix-run/react';
-import {useState} from 'react';
+import {Form, Link} from '@remix-run/react';
 
 export async function loader({context, params}: LoaderArgs) {
-  const customerAccessToken = await context.session.get('customerAccessToken');
+  const {customer} = context;
 
-  if (customerAccessToken) {
+  if (customer.isAuthenticated)
     return redirect(params.lang ? `${params.lang}/account` : '/account');
-  }
 
   return new Response(null);
 }
-
-type ActionData = {
-  formError?: string;
-};
-
-const badRequest = (data: ActionData) => json(data, {status: 400});
 
 export const action: ActionFunction = async ({request, context, params}) => {
   const formData = await request.formData();
@@ -36,17 +27,27 @@ export const action: ActionFunction = async ({request, context, params}) => {
     typeof email !== 'string' ||
     typeof password !== 'string'
   ) {
-    return badRequest({
-      formError: 'Please provide both an email and a password.',
+    return new Response('Please provide both an email and a password.', {
+      status: 400,
     });
   }
 
-  // TODO Add login logic
+  const {customer} = context;
+
+  const {headers} = await customer.authenticate({
+    email,
+    password,
+  });
+
+  return redirect(params.lang ? `${params.lang}/account` : '/account', {
+    headers,
+  });
 };
 
-export default function Login() {
+function LoginForm() {
   return (
     <Form method="post">
+      <h2>Login</h2>
       <input
         id="email"
         name="email"
@@ -55,8 +56,6 @@ export default function Login() {
         required
         placeholder="Email address"
         aria-label="Email address"
-        // eslint-disable-next-line jsx-a11y/no-autofocus
-        autoFocus
       />
       <input
         id="password"
@@ -67,10 +66,22 @@ export default function Login() {
         aria-label="Password"
         minLength={8}
         required
-        // eslint-disable-next-line jsx-a11y/no-autofocus
-        autoFocus
       />
       <button type="submit">Sign in</button>
+      <Link to="/account/recover">Forgot?</Link>
     </Form>
+  );
+}
+
+export default function Login() {
+  return <LoginForm />;
+}
+
+export function ErrorBoundary({error}: {error: Error}) {
+  return (
+    <div>
+      <pre>{error.message}</pre>
+      <LoginForm />
+    </div>
   );
 }

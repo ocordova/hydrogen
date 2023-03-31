@@ -48,10 +48,11 @@ export const meta: MetaFunction = () => ({
 });
 
 export async function loader({request, context}: LoaderArgs) {
-  const [customerAccessToken, cartId, layout] = await Promise.all([
+  const [customerAccessToken, cartId, layout, customer] = await Promise.all([
     context.session.get('customerAccessToken'),
     context.session.get('cartId'),
     getLayoutData(context),
+    context.customer.get(),
   ]);
 
   const seo = seoPayload.root({shop: layout.shop, url: request.url});
@@ -66,6 +67,7 @@ export async function loader({request, context}: LoaderArgs) {
       shopId: layout.shop.id,
     },
     seo,
+    customer,
   });
 }
 
@@ -89,6 +91,7 @@ export default function App() {
           key={`${locale.language}-${locale.country}`}
         >
           <Outlet />
+          <pre>{JSON.stringify(data.customer, null, 2)}</pre>
         </Layout>
         <ScrollRestoration />
         <Scripts />

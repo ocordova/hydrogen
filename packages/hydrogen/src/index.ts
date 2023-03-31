@@ -13,6 +13,8 @@ export {graphiqlLoader} from './routing/graphiql';
 export {Seo} from './seo/seo';
 export {type SeoConfig} from './seo/generate-seo-tags';
 export type {SeoHandleFunction} from './seo/seo';
+export {CustomerContext} from './customer/context';
+export {useCustomer} from './customer/hooks';
 
 export {
   AnalyticsEventName,
