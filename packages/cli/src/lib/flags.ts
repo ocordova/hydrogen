@@ -29,6 +29,11 @@ export const commonFlags = {
     env: 'SHOPIFY_SHOP',
     parse: async (input) => normalizeStoreFqdn(input),
   }),
+  hydrogenStorefront: Flags.string({
+    char: 'h',
+    description: 'The name of a Hydrogen Storefront (e.g. "Jane\'s Apparel")',
+    env: 'SHOPIFY_HYDROGEN_STOREFRONT',
+  }),
 };
 
 export function flagsToCamelObject(obj: Record<string, any>) {
