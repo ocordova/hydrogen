@@ -237,6 +237,7 @@ function useLoadMoreWhenInView<Resource extends Connection>({
       location.pathname + `?index&cursor=${endCursor}&direction=next`;
 
     navigate(nextPageUrl, {
+      preventScrollReset: true,
       state: {
         pageInfo: {
           endCursor,
